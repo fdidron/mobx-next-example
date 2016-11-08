@@ -9,20 +9,24 @@ import TodoList from '../components/todo/list.js';
 export default class extends React.Component {
   static async getInitialProps ({ req }) {
     const isServer = !!req;
-    return {isServer};
+    const stores = Stores(isServer);
+    await stores.TodoStore.fetchInitialTodos();
+    return {initialState: stores.getState(), isServer};
   }
 
   constructor(props) {
     super(props);
-    this.stores = Stores(props.isServer);
+    this.stores = Stores(props.isServer, props.initialState);
   }
+
   render () {
     return <Provider { ...this.stores }>
       <div>
         <h1>Add Todo</h1>
         <AddTodo />
-        <TodoList />
         <Link href="/">I'm done !</Link>
+        <hr />
+        <TodoList />
       </div>
     </Provider>
   }

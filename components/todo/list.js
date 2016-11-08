@@ -29,9 +29,9 @@ class ListTodo extends React.Component {
   }
 
   render () {
-    return <ul>
-      { this.props.TodoStore.todos.map( todo => <Todo todo={ todo } key={ todo.id } /> )}
-    </ul>;
+    return <ol>
+      { this.props.TodoStore.todos.reverse().map( todo => <Todo todo={ todo } key={ todo.id } /> )}
+    </ol>;
   }
 }
 

@@ -9,6 +9,7 @@
   "author": "Florian Didron",
   "license": "MIT",
   "dependencies": {
+    "isomorphic-fetch": "^2.2.1",
     "mobx": "^2.6.2",
     "mobx-react": "^3.5.9",
     "next": "1.1.1",
