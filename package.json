@@ -1,0 +1,17 @@
+{
+  "name": "next-mobx-example",
+  "version": "1.0.0",
+  "description": "A set of examples to get started with Mobx and Next.JS",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next"
+  },
+  "author": "Florian Didron",
+  "license": "MIT",
+  "dependencies": {
+    "mobx": "^2.6.2",
+    "mobx-react": "^3.5.9",
+    "next": "1.1.1",
+    "uuid": "^2.0.3"
+  }
+}
