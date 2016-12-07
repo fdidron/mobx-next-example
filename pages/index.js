@@ -1,32 +1,23 @@
-import React from 'react'
-import { Provider } from 'mobx-react';
+import React from 'react';
 import Link from 'next/link';
+import OctoIcon from 'react-icons/lib/go/mark-github';
 
+import Page from '../components/hoc/page';
 
-import Stores from '../stores/index.js';
-import TodoList from '../components/todo/list.js';
+import TodoList from '../components/compositions/todoList';
+import Content from '../components/primitives/content';
+import P from '../components/primitives/paragraph';
 
-export default class extends React.Component {
-  static async getInitialProps ({ req }) {
-    const isServer = !!req;
-    const stores = Stores(isServer);
-    await stores.TodoStore.fetchInitialTodos();
-    return {initialState: stores.getState(), isServer};
-  }
+const Index = () => <Content>
+  <P align="justify">
+  This is a proof of concept using mobx and next.js together.
+  It uses Firebase for persistency and authentication (Using the Github Api).
+  </P>
+  <P align="justify">
+  You can start by <Link href="add"><span>adding a todo</span></Link>.
+  You will need to enter your <OctoIcon /> Github credentials first.
+  </P>
+  <TodoList />
+</Content>;
 
-  constructor(props) {
-    super(props);
-    this.stores = Stores(props.isServer, props.initialState);
-  }
-
-  render () {
-    return <Provider { ...this.stores }>
-      <div>
-        <h1>Todo List</h1>
-        <Link href="/add"> Add a todo</Link>
-        <hr />
-        <TodoList />
-      </div>
-    </Provider>
-  }
-}
+export default Page(Index);

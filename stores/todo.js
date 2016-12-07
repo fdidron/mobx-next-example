@@ -1,68 +1,113 @@
 import { action, extendObservable } from 'mobx';
 import Uuid from 'uuid';
-import 'isomorphic-fetch';
+import Axios from 'axios';
+
+const API_BASE = 'https://mobx-next-todos.firebaseio.com/todos/';
 
 class Todo {
 
-  static fromJS(store, todo) {
-    return new Todo(store, todo.id, todo.title, todo.completed);
-  }
+  constructor(payload) {
 
-  constructor(store, id, title, completed) {
-    this.store = store;
-    this.id = id;
+    this.store = payload.store;
+    this.id = payload.id;
+    this.uid = payload.uid;
+    this.photoURL = payload.photoURL;
+    this.displayName = payload.displayName;
+    this.createdAt = payload.createdAt;
     extendObservable(this, {
-      title,
-      completed
+      title: payload.title,
+      completed: payload.completed,
+      loading: false
     });
+    if( payload.persist === true ) {
+      this.persistTodo();
+    }
   }
 
-  toggle = () => this.completed = !this.completed
+  changeTitle = title => {
+    this.title = title;
+    this.persistTodo();
+  }
 
-  destroy = () => this.store.todos.remove(this)
+  toggle = () => {
+    this.completed = !this.completed;
+    this.persistTodo();
+  }
+
+  destroy = async () => {
+    this.loading = true;
+    try {
+      await Axios.delete(`${API_BASE}${this.id}.json`);
+      this.store.todos.remove(this)
+    }
+    catch(e) {
+      console.error(e.message);
+    }
+    this.loading = false;
+  }
 
   setTitle = title => this.title = title
 
-  toJS = () => {
+  persistTodo = async () => {
+    this.loading = true;
+    try {
+      await Axios.put(`${API_BASE}${this.id}.json`, this.toJSON());
+    }
+    catch(e) {
+      console.error(e.message);
+    }
+    this.loading = false;
+  }
+
+  toJSON = () => {
     return {
       id: this.id,
       title: this.title,
-      completed: this.completed
+      completed: this.completed,
+      createdAt: this.createdAt,
+      photoURL: this.photoURL,
+      displayName: this.displayName,
+      uid: this.uid
     };
   }
 }
 
 export default class TodoStore {
 
-  static fromJS(initialState) {
-    const todoStore = new TodoStore();
-    todoStore.todos = initialState.map(todo => Todo.fromJS(todoStore, todo));
-    return todoStore;
-  }
-
-  constructor() {
+  constructor(initialState) {
     extendObservable(this, {
       todos: [],
     });
+    if(initialState) {
+      initialState.forEach( todo => this.addTodo(Object.assign({}, todo, {store: this}), false) );
+    }
   }
 
-  fetchInitialTodos = () => {
-    if(this.initialFetch == true) {
-      return true;
+  fetchTodos = async () => {
+    try {
+      const { data } = await Axios.get(`${API_BASE}.json?sortVyValue=createdAt`);
+      this.todos = [];
+      for (let id in data) {
+        const todo = data[id];
+        this.todos.push(new Todo(todo));
+      }
     }
-    return fetch('https://jsonplaceholder.typicode.com/todos')
-    .then(res => res.json())
-    .then(todos => {
-      todos.forEach(todo => this.addTodo(todo.title))
-      this.initialFetch = true;
+    catch(e) {
+      console.error(e.message);
     }
-    )
   }
 
-  addTodo = action( title =>
-    this.todos.push(new Todo(this, Uuid.v4(), title, false))
-  )
+  addTodo = action( (todo, persist) => {
+    const payload = Object.assign({}, todo, {
+      store: this,
+      id: todo.id || Uuid.v4(),
+      completed: false,
+      persist,
+      createdAt: todo.createdAt || Date.now() * -1 //Allows DESC sorting when fetching the todos from Firebase
+    });
+    this.todos.push(new Todo(payload));
+  })
 
-  toJS = () => this.todos.map(todo => todo.toJS())
+  toJSON = () => this.todos.map(todo => todo.toJSON())
 
 }

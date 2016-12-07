@@ -1,18 +1,34 @@
 {
-  "name": "next-mobx-example",
+  "name": "murasaki",
   "version": "1.0.0",
-  "description": "A set of examples to get started with Mobx and Next.JS",
+  "description": "Angels Inc Crowdfunding frontend",
   "main": "index.js",
   "scripts": {
-    "dev": "next"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
   },
-  "author": "Florian Didron",
-  "license": "MIT",
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "isomorphic-fetch": "^2.2.1",
+    "axios": "^0.15.2",
+    "fb": "^1.1.1",
+    "firebase": "^3.6.0",
+    "global": "^4.3.1",
+    "js-cookie": "^2.1.3",
     "mobx": "^2.6.2",
     "mobx-react": "^3.5.9",
-    "next": "1.1.1",
-    "uuid": "^2.0.3"
+    "next": "^1.1.1",
+    "react-contenteditable": "^2.0.1",
+    "react-icons": "^2.2.1",
+    "styled-components": "^1.0.10"
+  },
+  "devDependencies": {
+    "eslint": "3.10.2",
+    "eslint-config-airbnb": "13.0.0",
+    "eslint-plugin-import": "2.2.0",
+    "eslint-plugin-jsx-a11y": "2.2.3",
+    "eslint-plugin-react": "6.7.1"
   }
 }

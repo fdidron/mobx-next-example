@@ -1,31 +1,23 @@
-import TodoStore from './todo.js';
+// Helper file to construct a new Store on each server render
+// Or to construct and return a singleton on browser renders
+// Thanks to @impronunciable for pinpointing this requirement here :
+// https://github.com/zeit/next.js/wiki/Redux-example
+import User from './user';
+import Todo from './todo';
 
-const defaultState = {
-  TodoStore: null
-}
+const stores = {
+  __userStore__: initialState => new User(initialState),
+  __todoStore__: initialState => new Todo(initialState),
+};
 
-class Stores {
-  constructor(initialState) {
-    this.TodoStore = (initialState.TodoStore)
-    ? TodoStore.fromJS(initialState.TodoStore)
-    : new TodoStore();
-  }
-
-  getState() {
-    return {
-      TodoStore: this.TodoStore.toJS()
-    };
-  }
-}
-
-export default (isServer, initialState=defaultState) => {
-  if(isServer) {
-    return new Stores(initialState);
-  }
-  else {
-    if(!window.__stores__){
-      window.__stores__ = new Stores(initialState);
+export default (store, initialState) => {
+  const storeConstruct = stores[store];
+  if (typeof window !== 'undefined') {
+    if (!window[store]) {
+      window[store] = storeConstruct(initialState);
     }
-    return window.__stores__;
+    return window[store];
+  } else {
+    return storeConstruct(initialState);
   }
-}
+};
