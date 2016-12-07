@@ -35,8 +35,6 @@ export default ComposedComponent => class extends React.Component {
     };
   }
 
-  static prop
-
   constructor(props) {
     super(props);
     this.state = {
